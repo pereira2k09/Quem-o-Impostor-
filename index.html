@@ -23,6 +23,8 @@ label{display:block;color:#ddd;font-weight:800;font-size:14px;margin:16px 0 7px}
 .secret-card{min-height:55vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;border-radius:30px;background:linear-gradient(145deg,#1a1a21,#0b0b0f);border:1px solid #34343e;position:relative;overflow:hidden}.secret-card:before{content:"";position:absolute;inset:-30%;background:radial-gradient(circle,#f4c43018,transparent 55%);pointer-events:none}.player-number{color:var(--muted);font-size:13px}.player-name{font-size:clamp(38px,11vw,66px);font-weight:1000;letter-spacing:-.05em;margin:12px 0 35px;position:relative}.hold{width:min(92%,380px);height:92px;border-radius:22px;background:var(--accent);color:#111;font-size:17px;font-weight:1000;position:relative;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:none}.hold .progress{position:absolute;inset:0;width:0;background:#fff6;pointer-events:none}.hold span{position:relative;z-index:2}.secret{margin-top:22px;font-size:clamp(30px,9vw,52px);font-weight:1000;min-height:66px;display:flex;align-items:center;justify-content:center;position:relative}.secret.impostor{color:#ff6571;text-shadow:0 0 24px #ff4d5d33}.secret.word{color:var(--accent)}.hidden{visibility:hidden}.next-wrap{width:100%;margin-top:15px}
 .wheel{height:240px;border-radius:26px;background:#0d0d12;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}.wheel-name{font-size:clamp(30px,9vw,56px);font-weight:1000;text-align:center;padding:20px}.result{text-align:center;padding:24px 0}.result-name{font-size:clamp(44px,13vw,82px);font-weight:1000;color:var(--accent);line-height:.95;margin:18px 0}
 .back{background:none;color:var(--muted);padding:10px 0;font-weight:800}.footer-note{text-align:center;color:#777;font-size:11px;margin-top:25px}
+.guess-box{margin:12px 0;text-align:left;background:#0b0b0f;padding:12px;border-radius:12px;border:1px solid var(--line)}
+.guess-box select{margin-top:6px}
 @media(min-width:600px){.themes{grid-template-columns:repeat(3,1fr)}.grid{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
@@ -34,14 +36,14 @@ label{display:block;color:#ddd;font-weight:800;font-size:14px;margin:16px 0 7px}
     <div class="hero">
       <div class="logo">IMPOSTOR</div>
       <div class="subtitle">Um jogo foda feito pelo pereira.</div>
-      <button class="primary" onclick="go('players')">COMEÇAR PARTIDA</button>
-      <button class="secondary" onclick="showHow()">COMO JOGAR</button>
+      <button class="primary" onclick="go('players')">COMEÇA AI KRL</button>
+      <button class="secondary" onclick="showHow()">SOU BURRO</button>
     </div>
   </section>
 
   <section id="players" class="screen">
     <button class="back" onclick="go('home')">← Voltar</button>
-    <h1>Quem está jogando?</h1><p>Cadastre os jogadores que vão passar o dispositivo.</p>
+    <h1>Quem são os PCDs?</h1><p>Coloca os nome ai.</p>
     <div class="card">
       <div id="playersList"></div>
       <button class="secondary small" onclick="addPlayer()">+ Adicionar jogador</button>
@@ -50,9 +52,25 @@ label{display:block;color:#ddd;font-weight:800;font-size:14px;margin:16px 0 7px}
     <button class="primary" onclick="validatePlayers()">CONTINUAR</button>
   </section>
 
-  <section id="impostors" class="screen">
+  <section id="modeSelect" class="screen">
     <button class="back" onclick="go('players')">← Voltar</button>
-    <h1>Quantos impostores?</h1><p>Escolha quantos jogadores ficarão sem a palavra.</p>
+    <h1>Modo de Jogo</h1><p>Escolha como vocês querem jogar nesta partida.</p>
+    <div class="grid">
+      <button class="option selected" id="gameModeClassic" onclick="setGameType('classic')">
+        <strong>Normal (Impostor)</strong>
+        <span>Uns sabem a palavra, outros são impostores.</span>
+      </button>
+      <button class="option" id="gameModePair" onclick="setGameType('pair')">
+        <strong>Arroz e Feijão</strong>
+        <span>Todos recebem palavras do mesmo tema, mas só 1 dupla ou trio tem a palavra igual!</span>
+      </button>
+    </div>
+    <button class="primary" onclick="goFromModeSelect()">CONTINUAR</button>
+  </section>
+
+  <section id="impostors" class="screen">
+    <button class="back" onclick="go('modeSelect')">← Voltar</button>
+    <h1 id="impTitle">Configuração do Modo</h1><p id="impSub">Escolha as regras do jogo.</p>
     <div class="grid" id="impOptions"></div>
     <div class="notice" style="margin-top:14px" id="impHint"></div>
     <button class="primary" onclick="go('words')">CONTINUAR</button>
@@ -85,7 +103,7 @@ label{display:block;color:#ddd;font-weight:800;font-size:14px;margin:16px 0 7px}
   </section>
 
   <section id="draw" class="screen">
-    <h1 class="center">Quem começa?</h1><p class="center">O sorteio só considera jogadores que receberam a palavra.</p>
+    <h1 class="center">Quem começa?</h1><p class="center">Sorteando quem daria a primeira dica...</p>
     <div class="wheel"><div class="wheel-name" id="wheelName">Preparando...</div></div>
     <button class="primary" id="drawBtn" onclick="runDraw()">SORTEAR</button>
     <div id="drawResult" class="result" style="display:none">
@@ -96,12 +114,26 @@ label{display:block;color:#ddd;font-weight:800;font-size:14px;margin:16px 0 7px}
   </section>
 
   <section id="playing" class="screen">
-    <div class="hero" style="padding:9vh 0 5vh">
+    <div class="hero" style="padding:6vh 0 3vh">
       <div style="font-size:54px">🎭</div>
       <h1>Agora é com vocês!</h1>
       <p id="playingText"></p>
       <button class="primary" onclick="finishGame()">PARTIDA FINALIZADA</button>
     </div>
+  </section>
+
+  <section id="revealPairs" class="screen">
+    <h1>Resultados: Arroz e Feijão</h1>
+    <p>Selecione quem cada pessoa achava que era sua dupla/trio para ver se acertaram!</p>
+    <div id="guessesList"></div>
+    <button class="primary" onclick="showPairResults()">REVELAR QUEM ERA A DUPLA/TRIO</button>
+    <div id="pairResultBox" class="card" style="display:none;margin-top:20px;text-align:center">
+      <h2>A Dupla/Trio Real era:</h2>
+      <div id="realPairNames" style="font-size:24px;font-weight:900;color:var(--accent);margin:15px 0"></div>
+      <p id="realWordText" style="color:#fff;font-weight:bold"></p>
+      <div id="guessesFeedback" style="text-align:left;margin-top:15px"></div>
+    </div>
+    <button class="secondary" id="btnFinishPair" style="display:none" onclick="go('finish')">ENCERRAR PARTIDA</button>
   </section>
 
   <section id="bank" class="screen">
@@ -126,11 +158,10 @@ label{display:block;color:#ddd;font-weight:800;font-size:14px;margin:16px 0 7px}
     <button class="back" onclick="go('home')">← Voltar</button>
     <h1>Como jogar</h1>
     <div class="card">
-      <h2>1. Configure</h2><p>Coloque os nomes, escolha os impostores e selecione palavras gerais ou um tema.</p>
-      <h2>2. Passe o celular</h2><p>Cada jogador verá seu nome. Ele deve segurar o botão para descobrir a palavra ou se é o impostor.</p>
-      <h2>3. Não deixe ninguém ver</h2><p>Ao soltar o botão, a informação desaparece. Passe o dispositivo para o próximo jogador.</p>
-      <h2>4. Sorteio</h2><p>Quando todos terminarem, o site sorteia quem começa. Impostores nunca entram nesse sorteio.</p>
-      <h2>5. Jogue presencialmente</h2><p>O jogador sorteado começa dando uma dica. Depois, conversem e tentem descobrir o impostor.</p>
+      <h2>1. Configure</h2><p>Coloque os nomes, escolha o modo de jogo (Tradicional ou Arroz e Feijão) e selecione o tema.</p>
+      <h2>2. Modo Arroz e Feijão</h2><p>Neste modo, TODOS recebem palavras do mesmo tema. Mas só UMA DUPLA (ou trio) tem a palavra exatamente igual! Todos tentam achar seu par durante as dicas.</p>
+      <h2>3. Passe o celular</h2><p>Cada jogador verá seu nome. Ele deve segurar o botão para descobrir a palavra.</p>
+      <h2>4. Sorteio & Jogo</h2><p>O site sorteia quem começa a dar a dica. Falem suas dicas sem dar na cara e descubram quem combina com quem!</p>
     </div>
   </section>
 
@@ -144,17 +175,22 @@ label{display:block;color:#ddd;font-weight:800;font-size:14px;margin:16px 0 7px}
 </div>
 
 <script>
-const WORDS = {"Jogos e franquias":["Minecraft","Roblox","Fortnite","Free Fire","GTA","FIFA / EA Sports FC","PES / eFootball","Call of Duty","PUBG","Counter-Strike","League of Legends","Valorant","Among Us","Pokémon","Super Mario Bros.","Sonic","Pac-Man","Tetris","Mortal Kombat","Street Fighter","Tekken","God of War","The Last of Us","Red Dead Redemption","Grand Theft Auto","Halo","Forza Horizon","Need for Speed","Rocket League","Fall Guys","Terraria","Stardew Valley","Undertale","Friday Night Funkin'","Subway Surfers","Candy Crush","Clash of Clans","Clash Royale","Brawl Stars","Angry Birds","Plants vs. Zombies","Just Dance","The Sims","Resident Evil","Assassin's Creed","Zelda","Donkey Kong","Wii Sports","Super Smash Bros."],"Comidas e Bebidas":["Pizza","Hambúrguer","Batata frita","Cachorro-quente","Lasanha","Macarrão","Sushi","Tacos","Burrito","Nachos","Churrasco","Feijoada","Arroz e feijão","Coxinha","Pão de queijo","Pastel","Brigadeiro","Açaí","Tapioca","Pão","Croissant","Panqueca","Waffle","Donut","Cookie","Bolo","Sorvete","Chocolate","Pipoca","Frango frito","Nuggets","Purê de batata","Omelete","Ovos fritos","Salada","Sopa","Ramen","Yakisoba","Empanada","Queijo","Costela","Milho","Coca-Cola","Pepsi","Guaraná","Fanta","Sprite","Red Bull","Monster","Gatorade","Água","Água com gás","Suco de laranja","Suco de limão","Suco de uva","Suco de maracujá","Suco de manga","Suco de morango","Limonada","Chá","Café","Café com leite","Cappuccino","Chocolate quente","Milkshake","Água de coco","Água tônica","Leite","Achocolatado","Caldo de cana","Margarita","Caipirinha","Cerveja","Vinho","Champagne"],"Lugares":["Mercado","Supermercado","Shopping","Banco","Farmácia","Hospital","Escola","Faculdade","Restaurante","Lanchonete","Padaria","Pizzaria","Hamburgueria","Sorveteria","Cafeteria","Bar","Loja de roupas","Loja de eletrônicos","Loja de brinquedos","Loja de móveis","Loja de materiais de construção","Pet shop","Salão de beleza","Barbearia","Academia","Cinema","Teatro","Parque","Praça","Posto de gasolina","Oficina mecânica","Lava-rápido","Estacionamento","Aeroporto","Estação de trem","Estação de metrô","Delegacia","Corpo de bombeiros","Prefeitura","Correios","Igreja","Hotel","Motel","Biblioteca","Museu","Estádio","Parque de diversões","Feira"],"Países":["Brasil","Estados Unidos","Canadá","México","Argentina","Chile","Colômbia","Peru","Reino Unido","França","Alemanha","Itália","Espanha","Portugal","Países Baixos","Bélgica","Suíça","Áustria","Grécia","Rússia","Ucrânia","Turquia","Egito","África do Sul","Nigéria","Marrocos","Japão","China","Coreia do Sul","Índia","Tailândia","Vietnã","Indonésia","Filipinas","Singapura","Austrália","Nova Zelândia","Arábia Saudita","Emirados Árabes Unidos","Israel","Irã","Iraque","Paquistão","Polônia","Suécia","Noruega","Dinamarca","Finlândia","Irlanda","Islândia"],"Objetos":["Cadeira","Mesa","Sofá","Cama","Travesseiro","Cobertor","Colchão","Guarda-roupa","Armário","Prateleira","Banco","Poltrona","Escrivaninha","Aparador","Cômoda","Cabide","Espelho","Tapete","Cortina","Almofada","Abajur","Luminária","Ventilador","Aquecedor","Relógio","Quadro","Porta-retrato","Vaso","Cesto","Lixeira","Caixa","Baú","Cofre","Chave","Fechadura","Maçaneta","Campainha","Guarda-chuva","Lanterna","Vela","Isqueiro","Fósforo","Filtro de linha","Televisão","Controle remoto","Computador","Notebook","Tablet","Celular","Smartphone","Monitor","Teclado","Mouse","Mousepad","Webcam","Microfone","Fone de ouvido","Headset","Caixa de som","Alto-falante","Impressora","Projetor","Roteador","Pen drive","HD","SSD","Cartão de memória","Carregador","Bateria","Pilha","Joystick","Controle de videogame","Console","Câmera","Tripé","Drone","Smartwatch","Calculadora","Rádio","GPS","MP3 player","Gravador","Reprodutor de DVD","Geladeira","Freezer","Fogão","Forno","Micro-ondas","Air fryer","Liquidificador","Cafeteira","Chaleira","Torradeira","Sanduicheira","Espremedor","Panela","Frigideira","Assadeira","Forma de bolo","Travessa","Tigela","Prato","Copo","Taça","Xícara","Garrafa","Jarra","Garfo","Faca","Colher","Colher de pau","Espátula","Peneira","Ralador","Abridor de lata","Tábua de corte","Funil","Pote","Panela de pressão","Marmita","Garrafa térmica","Porta-copos","Saleiro","Escorredor de pratos","Luva de forno","Avental","Papel-alumínio","Filme plástico","Guardanapo","Papel-toalha","Toalha de mesa","Copo térmico","Canudo","Palito","Espeto","Churrasqueira","Grelha","Timer","Forma de gelo","Esponja","Detergente","Sabão","Pano de prato","Rodo","Vassoura","Pá","Balde","Escova de dentes","Pasta de dentes","Fio dental","Sabonete","Shampoo","Condicionador","Bucha","Toalha","Roupão","Escova de cabelo","Pente","Secador de cabelo","Chapinha","Barbeador","Máquina de cortar cabelo","Tesoura","Cortador de unhas","Pinça","Desodorante","Perfume","Creme hidratante","Protetor solar","Algodão","Cotonete","Papel higiênico","Tapete de banheiro","Escova sanitária","Desentupidor","Cesto de roupa","Pregador de roupa","Varal","Ferro de passar","Tábua de passar","Máquina de lavar","Aspirador de pó","Esfregão","Camisa","Blusa","Moletom","Casaco","Jaqueta","Calça","Shorts","Bermuda","Saia","Vestido","Terno","Gravata","Cinto","Meia","Cueca","Calcinha","Sutiã","Pijama","Biquíni","Boné","Chapéu","Gorro","Cachecol","Luva","Tênis","Chinelo","Bota","Chuteira","Pantufa","Mochila","Bolsa","Carteira","Mala","Óculos","Óculos de sol","Pulseira","Colar","Brinco","Anel","Elástico de cabelo","Caderno","Livro","Jornal","Diário","Pasta","Envelope","Folha de papel","Cartolina","Papelão","Lápis","Lapiseira","Caneta","Canetinha","Giz de cera","Borracha","Apontador","Régua","Cola","Fita adesiva","Grampeador","Apagador","Pincel","Tinta","Estojo","Lancheira","Estilete","Etiqueta","Carimbo","Bola de futebol","Bola de basquete","Bola de vôlei","Bola de tênis","Raquete","Skate","Patins","Bicicleta","Capacete","Patinete","Pipa","Corda","Bambolê","Peteca","Dardo","Arco","Flecha","Rede","Trampolim","Apito","Cronômetro","Medalha","Troféu","Tabuleiro","Dado","Peão","Dominó","Baralho","Xadrez","Dama","Ioiô","Pião","Cubo mágico","Boneco","Urso de pelúcia","Carrinho de brinquedo","Lego","Bola de gude","Videogame portátil","Cartas colecionáveis","Pistola de água"]};
-const TOTAL_WORDS = 469;
+const WORDS = {"Jogos e franquias":["Minecraft","Roblox","Fortnite","Free Fire","GTA","FIFA / EA Sports FC","PES / eFootball","Call of Duty","PUBG","Counter-Strike","League of Legends","Valorant","Among Us","Pokémon","Super Mario Bros.","Sonic","Pac-Man","Tetris","Mortal Kombat","Street Fighter","Tekken","God of War","The Last of Us","Red Dead Redemption","Grand Theft Auto","Halo","Forza Horizon","Need for Speed","Rocket League","Fall Guys","Terraria","Stardew Valley","Undertale","Friday Night Funkin'","Subway Surfers","Candy Crush","Clash of Clans","Clash Royale","Brawl Stars","Angry Birds","Plants vs. Zombies","Just Dance","The Sims","Resident Evil","Assassin's Creed","Zelda","Donkey Kong","Wii Sports","Super Smash Bros."],"Comidas e Bebidas":["Pizza","Hambúrguer","Batata frita","Cachorro-quente","Lasanha","Macarrão","Sushi","Tacos","Burrito","Nachos","Churrasco","Feijoada","Arroz e feijão","Coxinha","Pão de queijo","Pastel","Brigadeiro","Açaí","Tapioca","Pão","Croissant","Panqueca","Waffle","Donut","Cookie","Bolo","Sorvete","Chocolate","Pipoca","Frango frito","Nuggets","Purê de batata","Omelete","Ovos fritos","Salada","Sopa","Ramen","Yakisoba","Empanada","Queijo","Costela","Milho","Coca-Cola","Pepsi","Guaraná","Fanta","Sprite","Red Bull","Monster","Gatorade","Água","Água com gás","Suco de laranja","Suco de limão","Suco de uva","Suco de maracujá","Suco de manga","Suco de morango","Limonada","Chá","Café","Café com leite","Cappuccino","Chocolate quente","Milkshake","Água de coco","Água tônica","Leite","Achocolatado","Caldo de cana","Margarita","Caipirinha","Cerveja","Vinho","Champagne"],"Lugares":["Mercado","Supermercado","Shopping","Banco","Farmácia","Hospital","Escola","Faculdade","Restaurante","Lanchonete","Padaria","Pizzaria","Hamburgueria","Sorveteria","Cafeteria","Bar","Loja de roupas","Loja de eletrônicos","Loja de brinquedos","Loja de móveis","Loja de materiais de construção","Pet shop","Salão de beleza","Barbearia","Academia","Cinema","Teatro","Parque","Praça","Posto de gasolina","Oficina mecânica","Lava-rápido","Estacionamento","Aeroporto","Estação de trem","Estação de metrô","Delegacia","Corpo de bombeiros","Prefeitura","Correios","Igreja","Hotel","Motel","Biblioteca","Museu","Estádio","Parque de diversões","Feira"],"Países":["Brasil","Estados Unidos","Canadá","México","Argentina","Chile","Colômbia","Peru","Reino Unido","França","Alemanha","Itália","Espanha","Portugal","Países Baixos","Bélgica","Suíça","Áustria","Grécia","Rússia","Ucrânia","Turquia","Egito","África do Sul","Nigéria","Marrocos","Japão","China","Coreia do Sul","Índia","Tailândia","Vietnã","Indonésia","Filipinas","Singapura","Austrália","Nova Zelândia","Arábia Saudita","Emirados Árabes Unidos","Israel","Irã","Iraque","Paquistão","Polônia","Suécia","Noruega","Dinamarca","Finlândia","Irlanda","Islândia"],"Objetos":["Cadeira","Mesa","Sofá","Cama","Travesseiro","Cobertor","Colchão","Guarda-roupa","Armário","Prateleira","Banco","Poltrona","Escrivaninha","Aparador","Cômoda","Cabide","Espelho","Tapete","Cortina","Almofada","Abajur","Luminária","Ventilador","Aquecedor","Relógio","Quadro","Porta-retrato","Vaso","Cesto","Lixeira","Caixa","Baú","Cofre","Chave","Fechadura","Maçaneta","Campainha","Guarda-chuva","Lanterna","Vela","Isqueiro","Fósforo","Filtro de linha","Televisão","Controle remoto","Computador","Notebook","Tablet","Celular","Smartphone","Monitor","Teclado","Mouse","Mousepad","Webcam","Microfone","Fone de ouvido","Headset","Caixa de som","Alto-falante","Impressora","Projetor","Roteador","Pen drive","HD","SSD","Cartão de memória","Carregador","Bateria","Pilha","Joystick","Controle de videogame","Console","Câmera","Tripé","Drone","Smartwatch","Calculadora","Rádio","GPS","MP3 player","Gravador","Reprodutor de DVD","Geladeira","Freezer","Fogão","Forno","Micro-ondas","Air fryer","Liquidificador","Cafeteira","Chaleira","Torradeira","Sanduicheira","Espremedor","Panela","Frigideira","Assadeira","Forma de bolo","Travessa","Tigela","Prato","Copo","Taça","Xícara","Garrafa","Jarra","Garfo","Faca","Colher","Colher de pau","Espátula","Peneira","Ralador","Abridor de lata","Tábua de corte","Funil","Pote","Panela de pressão","Marmita","Garrafa térmica","Porta-copos","Saleiro","Escorredor de pratos","Luva de forno","Avental","Papel-alumínio","Filme plástico","Guardanapo","Papel-toalha","Toalha de mesa","Copo térmico","Canudo","Palito","Espeto","Churrasqueira","Grelha","Timer","Forma de gelo","Esponja","Detergente","Sabão","Pano de prato","Rodo","Vassoura","Pá","Balde","Escova de dentes","Pasta de dentes","Fio dental","Sabonete","Shampoo","Condicionador","Bucha","Toalha","Roupão","Escova de cabelo","Pente","Secador de cabelo","Chapinha","Barbeador","Máquina de cortar cabelo","Tesoura","Cortador de unhas","Pinça","Desodorante","Perfume","Creme hidratante","Protetor solar","Algodão","Cotonete","Papel higiênico","Tapete de banheiro","Escova sanitária","Desentupidor","Cesto de roupa","Pregador de roupa","Varal","Ferro de passar","Tábua de passar","Máquina de lavar","Aspirador de pó","Esfregão","Camisa","Blusa","Moletom","Casaco","Jaqueta","Calça","Shorts","Bermuda","Saia","Vestido","Terno","Gravata","Cinto","Meia","Cueca","Calcinha","Sutiã","Pijama","Biquíni","Boné","Chapéu","Gorro","Cachecol","Luva","Tênis","Chinelo","Bota","Chuteira","Pantufa","Mochila","Bolsa","Carteira","Mala","Óculos","Óculos de sol","Pulseira","Colar","Brinco","Anel","Elástico de cabelo","Caderno","Livro","Jornal","Diário","Pasta","Envelope","Folha de papel","Cartolina","Papelão","Lápis","Lapiseira","Caneta","Canetinha","Giz de cera","Borracha","Apontador","Régua","Cola","Fita adesiva","Grampeador","Apagador","Pincel","Tinta","Estojo","Lancheira","Estilete","Etiqueta","Carimbo","Bola de futebol","Bola de basquete","Bola de vôlei","Bola de tênis","Raquete","Skate","Patins","Bicicleta","Capacete","Patinete","Pipa","Corda","Bambolê","Peteca","Dardo","Arco","Flecha","Rede","Trampolim","Apito","Cronômetro","Medalha","Troféu","Tabuleiro","Dado","Peão","Dominó","Baralho","Xadrez","Dama","Ioiô","Pião","Cubo mágico","Boneco","Urso de pelúcia","Carrinho de brinquedo","Lego","Bola de gude","Videogame portátil","Cartas colecionáveis","Pistola de água"],"Pessoas Reais":["Neymar Jr","Pelé","Jeffrey Epstein","Vini Jr","Lebron James","Lazáro Barbosa","Messi","Cristiano Ronaldo","Maradona","Trump","Lula Presidente","Bolsonaro","Renato Cariane","Bistecone","Alanzoka","Galvão Bueno","Davy Jones","Raulzito","Nobru","Travis Scott","Kanye West","Matuê","Péricles","Drake","Albert Eisntein","Tiaguinho","Julio Balestrini","Mr Beast","Puff Daddy","Virgínia","Anita","Ocastrin","Sabrina Carpinter","Luciano Hulk","Ana Maria Braga","Yuri Alberto","Obama","Michael Jackson","Ronaldinho","Ronaldo Fênomeno","Romário","Buzeira","MC Ryan SP","Mia Kalifha","Michael Jordan","Kylian Mbappé","Halland","Coringa streamer","Luan Gameplay","Leon coisa de nerd","BRKSEDU","Flakes Power","Lamine Yamal","Raphinha","Monark","Igor3K","Authentic Games","IshowSpeed","Elon Musk","Aldof Hitler","Pedro Álvares Cabral","Josef Stalin"]};
+
 const state = {
   players: ["Jogador 1","Jogador 2","Jogador 3","Jogador 4"],
-  impostors: 1, mode: "all", theme: null, word: "", roles: [], index: 0,
-  seenWord: false, lastWord: null, winner: null, wordTheme: null
+  gameType: "classic",
+  pairGroupSize: 2,
+  impostors: 1, mode: "all", theme: null, 
+  assignedWords: [],
+  roles: [], index: 0,
+  seenWord: false, lastWord: null, winner: null, wordTheme: null,
+  targetPairIndices: []
 };
 
 let CUSTOM_WORDS = loadCustomWords();
 const $ = id => document.getElementById(id);
-const screens = ["home","players","impostors","words","reveal","draw","playing","how","finish"];
+const screens = ["home","players","modeSelect","impostors","words","reveal","draw","playing","revealPairs","how","finish"];
 
 function loadCustomWords(){
   try{return JSON.parse(localStorage.getItem("impostor_custom_words")||"[]")}catch(e){return []}
@@ -184,7 +220,7 @@ function escapeHtml(v){return v.replace(/[&<>\"]/g,m=>({"&":"&amp;","<":"&lt;","
 
 function go(id){
   screens.forEach(s=>$(s).classList.toggle("active",s===id));
-  const labels={home:"",players:"1 / 3",impostors:"2 / 3",words:"3 / 3",reveal:"Cartas",draw:"Sorteio",playing:"Jogo",how:"",bank:"",finish:""};
+  const labels={home:"",players:"1 / 4",modeSelect:"2 / 4",impostors:"3 / 4",words:"4 / 4",reveal:"Cartas",draw:"Sorteio",playing:"Jogo",revealPairs:"Votação",how:"",bank:"",finish:""};
   $("step").textContent=labels[id]||"";
   if(id==="bank") renderBank();
   if(id==="players") renderPlayers();
@@ -219,20 +255,55 @@ function validatePlayers(){
   if(state.players.some(x=>!x)) return alert("Preencha todos os nomes.");
   const seen=new Set(), dup=state.players.find(x=>seen.has(x.toLowerCase())||(seen.add(x.toLowerCase()),false));
   if(dup) return alert("Não use nomes repetidos: "+dup);
-  state.impostors=Math.min(state.impostors, Math.max(1,Math.floor(state.players.length/3)));
+  go("modeSelect");
+}
+
+function setGameType(type){
+  state.gameType = type;
+  $("gameModeClassic").classList.toggle("selected", type==="classic");
+  $("gameModePair").classList.toggle("selected", type==="pair");
+}
+
+function goFromModeSelect(){
+  if(state.gameType === "pair" && state.players.length < 4){
+    return alert("O modo Arroz e Feijão precisa de no mínimo 4 jogadores!");
+  }
   go("impostors");
 }
+
 function renderImpostors(){
-  const max=Math.max(1,Math.min(6,Math.floor(state.players.length/3)));
-  if(state.impostors>max) state.impostors=max;
   $("impOptions").innerHTML="";
-  for(let n=1;n<=max;n++){
-    const b=document.createElement("button"); b.className="option"+(n===state.impostors?" selected":"");
-    b.innerHTML=`<strong>${n} impostor${n>1?"es":""}</strong><span>${n===1?"Recomendado para grupos menores":"Partida mais caótica"}</span>`;
-    b.onclick=()=>{state.impostors=n;renderImpostors()}; $("impOptions").appendChild(b);
+  if(state.gameType === "classic"){
+    $("impTitle").textContent = "Quantos impostores?";
+    $("impSub").textContent = "Escolha quantos jogadores ficarão sem a palavra.";
+    const max=Math.max(1,Math.min(6,Math.floor(state.players.length/3)));
+    if(state.impostors>max) state.impostors=max;
+    for(let n=1;n<=max;n++){
+      const b=document.createElement("button"); b.className="option"+(n===state.impostors?" selected":"");
+      b.innerHTML=`<strong>${n} impostor${n>1?"es":""}</strong><span>${n===1?"Recomendado para grupos menores":"Partida mais caótica"}</span>`;
+      b.onclick=()=>{state.impostors=n;renderImpostors()}; $("impOptions").appendChild(b);
+    }
+    $("impHint").textContent=`Para ${state.players.length} jogadores, recomendamos ${Math.min(2,Math.max(1,Math.floor(state.players.length/4)))} impostor${Math.min(2,Math.max(1,Math.floor(state.players.length/4)))>1?"es":""}.`;
+  } else {
+    $("impTitle").textContent = "Modo Arroz e Feijão";
+    $("impSub").textContent = "Escolha a formação do par verdadeiro:";
+    
+    const b2=document.createElement("button"); b2.className="option"+(state.pairGroupSize===2?" selected":"");
+    b2.innerHTML=`<strong>Dupla (2 com palavra igual)</strong><span>Mínimo 4 pessoas. Todos os outros têm palavras diferentes.</span>`;
+    b2.onclick=()=>{state.pairGroupSize=2;renderImpostors()}; $("impOptions").appendChild(b2);
+
+    if(state.players.length >= 5){
+      const b3=document.createElement("button"); b3.className="option"+(state.pairGroupSize===3?" selected":"");
+      b3.innerHTML=`<strong>Trio (3 com palavra igual)</strong><span>Mínimo 5 pessoas. Todos os outros têm palavras diferentes.</span>`;
+      b3.onclick=()=>{state.pairGroupSize=3;renderImpostors()}; $("impOptions").appendChild(b3);
+    } else {
+      if(state.pairGroupSize === 3) state.pairGroupSize = 2;
+    }
+
+    $("impHint").textContent = `Neste modo, apenas ${state.pairGroupSize} pessoas terão a mesma palavra. Todos as outras pessoas terão palavras diferentes dentro do mesmo tema!`;
   }
-  $("impHint").textContent=`Para ${state.players.length} jogadores, recomendamos ${Math.min(2,Math.max(1,Math.floor(state.players.length/4)))} impostor${Math.min(2,Math.max(1,Math.floor(state.players.length/4)))>1?"es":""}.`;
 }
+
 function renderWords(){
   $("wordCount").textContent=allWordEntries().length.toLocaleString("pt-BR");
   $("themes").innerHTML="";
@@ -246,25 +317,71 @@ function renderWords(){
 }
 function setMode(m){state.mode=m;if(m==="all")state.theme=null;renderWords()}
 
-function pickWord(){
-  let pool=allWordEntries();
-  if(state.mode==="theme"&&state.theme) pool=pool.filter(x=>x.theme===state.theme);
-  if(!pool.length) throw new Error("Banco vazio");
-  let entry=pool[Math.floor(Math.random()*pool.length)];
-  if(pool.length>1 && entry.word===state.lastWord) entry=pool[(pool.findIndex(x=>x.word===entry.word)+1)%pool.length];
-  state.lastWord=entry.word; state.wordTheme=entry.theme; return entry.word;
-}
-
 function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+function setupWordsAndRoles(){
+  let pool = allWordEntries();
+  if(state.mode === "theme" && state.theme) {
+    pool = pool.filter(x => x.theme === state.theme);
+  }
+  if(!pool.length) throw new Error("Banco de palavras vazio para essa seleção.");
+
+  if(state.gameType === "classic"){
+    let entry = pool[Math.floor(Math.random()*pool.length)];
+    if(pool.length > 1 && entry.word === state.lastWord) entry = pool[(pool.findIndex(x=>x.word===entry.word)+1)%pool.length];
+    state.lastWord = entry.word; 
+    state.wordTheme = entry.theme;
+    
+    const ids = shuffle([...Array(state.players.length).keys()]);
+    state.roles = Array(state.players.length).fill("normal");
+    ids.slice(0, state.impostors).forEach(i => state.roles[i] = "impostor");
+    
+    state.assignedWords = state.players.map((_, i) => state.roles[i] === "impostor" ? "VOCÊ É O IMPOSTOR" : entry.word);
+  } else {
+    let chosenTheme = state.theme;
+    if(!chosenTheme){
+      const themesAvailable = [...new Set(pool.map(x => x.theme))];
+      chosenTheme = themesAvailable[Math.floor(Math.random()*themesAvailable.length)];
+    }
+    state.wordTheme = chosenTheme;
+
+    let themeWords = pool.filter(x => x.theme === chosenTheme).map(x => x.word);
+    themeWords = [...new Set(themeWords)];
+
+    if(themeWords.length < (state.players.length - state.pairGroupSize + 1)){
+      alert("O tema escolhido não tem palavras suficientes para todos os jogadores terem palavras distintas! Escolha outro tema ou adicione palavras.");
+      return false;
+    }
+
+    shuffle(themeWords);
+    const mainWord = themeWords.pop();
+    state.lastWord = mainWord;
+
+    const playerIndices = shuffle([...Array(state.players.length).keys()]);
+    state.targetPairIndices = playerIndices.slice(0, state.pairGroupSize);
+
+    state.assignedWords = Array(state.players.length).fill(null);
+    state.roles = Array(state.players.length).fill("normal");
+
+    state.targetPairIndices.forEach(idx => {
+      state.assignedWords[idx] = mainWord;
+    });
+
+    for(let i=0; i<state.players.length; i++){
+      if(state.assignedWords[i] === null){
+        state.assignedWords[i] = themeWords.pop();
+      }
+    }
+  }
+  return true;
+}
 
 function startGame(){
   if(state.mode==="theme"&&!state.theme) return alert("Escolha um tema.");
-  state.word=pickWord();
-  const ids=shuffle([...Array(state.players.length).keys()]);
-  state.roles=Array(state.players.length).fill("normal");
-  ids.slice(0,state.impostors).forEach(i=>state.roles[i]="impostor");
+  if(!setupWordsAndRoles()) return;
   state.index=0; state.seenWord=false; showReveal();
 }
+
 function showReveal(){
   go("reveal");
   const i=state.index;
@@ -278,6 +395,7 @@ function showReveal(){
   $("holdBtn").querySelector("span").textContent="SEGURE PARA VER";
   state.seenWord=false;
 }
+
 let holdTimer=null, holdStart=0;
 function startHold(e){
   e.preventDefault();
@@ -290,6 +408,7 @@ function startHold(e){
     if(p>=100) revealSecret();
   },16);
 }
+
 function stopHold(e){
   if(e) e.preventDefault();
   clearInterval(holdTimer); holdTimer=null;
@@ -299,26 +418,53 @@ function stopHold(e){
     $("secret").className="secret hidden";
   }
 }
+
 function revealSecret(){
   clearInterval(holdTimer);holdTimer=null;state.seenWord=true;
   const s=$("secret");
-  if(state.roles[state.index]==="impostor"){s.textContent="VOCÊ É O IMPOSTOR";s.className="secret impostor";}
-  else{s.textContent=state.word;s.className="secret word";}
+  const word = state.assignedWords[state.index];
+  
+  if(word === "VOCÊ É O IMPOSTOR"){
+    s.textContent = word;
+    s.className = "secret impostor";
+  } else {
+    s.textContent = word;
+    s.className = "secret word";
+  }
+  
   $("holdBtn").querySelector("span").textContent="INFORMAÇÃO REVELADA";
   $("nextBtn").style.display="block";
 }
+
 const hb=$("holdBtn");
 hb.addEventListener("pointerdown",startHold);hb.addEventListener("pointerup",stopHold);hb.addEventListener("pointercancel",stopHold);hb.addEventListener("pointerleave",stopHold);
+
 function nextPlayer(){
   if(!state.seenWord) return alert("Segure para ver sua carta antes de continuar.");
   $("secret").textContent=""; $("secret").className="secret hidden";
   state.index++;
-  if(state.index>=state.players.length){go("draw");$("wheelName").textContent="Pronto?";$("drawBtn").style.display="block";$("drawResult").style.display="none";}
+  if(state.index>=state.players.length){
+    go("draw");
+    $("wheelName").textContent="Pronto?";
+    $("drawBtn").disabled = false;
+    $("drawBtn").style.display="block";
+    $("drawResult").style.display="none";
+  }
   else showReveal();
 }
+
 function runDraw(){
   $("drawBtn").disabled=true;
-  const eligible=state.players.map((name,i)=>({name,i})).filter(x=>state.roles[x.i]!=="impostor");
+  
+  const eligible = [];
+  state.players.forEach((name, i) => {
+    const isImpostor = state.roles[i] === "impostor";
+    const weight = isImpostor ? 1 : 5; 
+    for (let w = 0; w < weight; w++) {
+      eligible.push({ name, i });
+    }
+  });
+
   let ticks=0, max=28+Math.floor(Math.random()*14);
   const timer=setInterval(()=>{
     $("wheelName").textContent=eligible[Math.floor(Math.random()*eligible.length)].name;
@@ -329,21 +475,98 @@ function runDraw(){
       state.winner=chosen.name;
       $("wheelName").textContent=chosen.name;
       $("winner").textContent=chosen.name;
-      $("winnerText").textContent=`${chosen.name} começa a rodada. Dê uma dica relacionada à palavra e deixem a investigação começar!`;
+      $("winnerText").textContent=`${chosen.name} começa a rodada! Dê sua dica e que comece a investigação.`;
       $("drawBtn").style.display="none";$("drawResult").style.display="block";
     }
   },70);
 }
-function finishGame(){go("finish")}
-function replay(){
-  state.word=pickWord();
-  const ids=shuffle([...Array(state.players.length).keys()]);
-  state.roles=Array(state.players.length).fill("normal");
-  ids.slice(0,state.impostors).forEach(i=>state.roles[i]="impostor");
-  state.index=0;showReveal();
+
+function finishGame(){
+  if(state.gameType === "pair"){
+    preparePairsReveal();
+    go("revealPairs");
+  } else {
+    go("finish");
+  }
 }
-function resetAll(){state.players=["Jogador 1","Jogador 2","Jogador 3","Jogador 4"];state.impostors=1;state.mode="all";state.theme=null;go("players")}
-$("playingText").textContent="O sorteio já escolheu quem começa. Agora a partida acontece presencialmente: conversem, deem dicas e tentem descobrir quem é o impostor.";
+
+function preparePairsReveal(){
+  const box = $("guessesList");
+  box.innerHTML = "";
+  $("pairResultBox").style.display = "none";
+  $("btnFinishPair").style.display = "none";
+
+  state.players.forEach((pName, i) => {
+    const div = document.createElement("div");
+    div.className = "guess-box";
+    div.innerHTML = `<label>Quem <b>${escapeHtml(pName)}</b> acha que é sua dupla/trio?</label>`;
+    
+    const sel = document.createElement("select");
+    sel.id = `guess_${i}`;
+    sel.innerHTML = `<option value="">-- Selecione um jogador --</option>`;
+    
+    state.players.forEach((otherName, j) => {
+      if(i !== j){
+        sel.innerHTML += `<option value="${j}">${escapeHtml(otherName)}</option>`;
+      }
+    });
+    div.appendChild(sel);
+    box.appendChild(div);
+  });
+}
+
+function showPairResults(){
+  const realNames = state.targetPairIndices.map(idx => state.players[idx]);
+  $("realPairNames").textContent = realNames.join(" & ");
+  $("realWordText").textContent = `Palavra secreta deles: "${state.lastWord}"`;
+
+  let feedbackHtml = "<h3>Palpites da galera:</h3>";
+  state.players.forEach((pName, i) => {
+    const sel = $(`guess_${i}`);
+    const chosenIdx = sel ? parseInt(sel.value) : -1;
+    
+    if(isNaN(chosenIdx) || chosenIdx < 0){
+      feedbackHtml += `<p><b>${escapeHtml(pName)}</b> não votou.</p>`;
+    } else {
+      const chosenName = state.players[chosenIdx];
+      const isTarget = state.targetPairIndices.includes(i);
+      const isChosenTarget = state.targetPairIndices.includes(chosenIdx);
+
+      let correct = false;
+      if(isTarget && isChosenTarget){
+        correct = true;
+      }
+
+      if(correct){
+        feedbackHtml += `<p>🟢 <b>${escapeHtml(pName)}</b> achou que era <b>${escapeHtml(chosenName)}</b> e <b style="color:var(--ok)">ACERTOU!</b></p>`;
+      } else {
+        feedbackHtml += `<p>🔴 <b>${escapeHtml(pName)}</b> achou que era <b>${escapeHtml(chosenName)}</b> e <b style="color:var(--danger)">ERROU!</b></p>`;
+      }
+    }
+  });
+
+  $("guessesFeedback").innerHTML = feedbackHtml;
+  $("pairResultBox").style.display = "block";
+  $("btnFinishPair").style.display = "block";
+}
+
+function replay(){
+  if(!setupWordsAndRoles()) return;
+  state.index=0;
+  showReveal();
+}
+
+function resetAll(){
+  state.players=["Jogador 1","Jogador 2","Jogador 3","Jogador 4"];
+  state.impostors=1;
+  state.gameType="classic";
+  state.pairGroupSize=2;
+  state.mode="all";
+  state.theme=null;
+  go("players");
+}
+
+$("playingText").textContent="O sorteio já escolheu quem começa. Agora a partida acontece presencialmente: conversem, deem dicas e tentem descobrir o segredo da rodada!";
 </script>
 </body>
 </html>
