@@ -33,7 +33,7 @@ label{display:block;color:#ddd;font-weight:800;font-size:14px;margin:16px 0 7px}
   <section id="home" class="screen active">
     <div class="hero">
       <div class="logo">IMPOSTOR</div>
-      <div class="subtitle">Um jogo presencial de dedução. Um celular. Vários jogadores. Uma palavra. E alguém que não sabe qual é.</div>
+      <div class="subtitle">Um jogo foda feito pelo pereira.</div>
       <button class="primary" onclick="go('players')">COMEÇAR PARTIDA</button>
       <button class="secondary" onclick="showHow()">COMO JOGAR</button>
     </div>
@@ -215,7 +215,7 @@ function addPlayer(){
 }
 function validatePlayers(){
   state.players=state.players.map(x=>x.trim());
-  if(state.players.length<4) return alert("Use pelo menos 4 jogadores.");
+  if(state.players.length<3) return alert("Use pelo menos 3 jogadores.");
   if(state.players.some(x=>!x)) return alert("Preencha todos os nomes.");
   const seen=new Set(), dup=state.players.find(x=>seen.has(x.toLowerCase())||(seen.add(x.toLowerCase()),false));
   if(dup) return alert("Não use nomes repetidos: "+dup);
