@@ -290,8 +290,8 @@ function goFromModeSelect(){
   if(state.gameType === "pair" && state.players.length < 4){
     return alert("O modo Arroz e Feijão precisa de no mínimo 4 jogadores!");
   }
-  if(state.gameType === "shield" && state.players.length !== 4){
-    return alert("O modo Escudo Humano foi feito para exatamente 4 jogadores (2 Normais, 1 Impostor e 1 Escudo Humano)!");
+  if(state.gameType === "shield" && state.players.length < 4){
+    return alert("O modo Escudo Humano precisa de pelo menos 4 jogadores (2 Normais, 1 Impostor e 1 Escudo Humano)!");
   }
   go("impostors");
 }
@@ -339,7 +339,7 @@ function renderImpostors(){
     $("impSub").textContent = "Regras fixas da partida:";
     
     const b=document.createElement("button"); b.className="option selected";
-    b.innerHTML=`<strong>4 Jogadores</strong><span>2 Normais | 1 Impostor | 1 Escudo Humano</span>`;
+    b.innerHTML=`<strong>Qualquer quantidade de jogadores (4+)</strong><span>2 Normais | 1 Impostor | 1 Escudo Humano | demais jogadores são Normais</span>`;
     $("impOptions").appendChild(b);
 
     $("impHint").textContent = `O Impostor quer sobreviver. O Escudo Humano NÃO sabe a palavra e ganha se for ELIMINADO no lugar do Impostor! Haverá apenas 1 eliminação única.`;
