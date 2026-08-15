@@ -20,11 +20,15 @@ label{display:block;color:#ddd;font-weight:800;font-size:14px;margin:16px 0 7px}
 .player-row{display:flex;gap:8px;align-items:center;margin:8px 0}.player-row input{margin:0}.remove{width:46px;height:46px;border-radius:12px;background:#211216;color:#ff9da7;font-size:20px}.count{font-size:13px;color:var(--muted);text-align:right;margin-top:8px}
 .themes{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;max-height:310px;overflow:auto;padding-right:2px}.theme{padding:13px;border:1px solid var(--line);border-radius:13px;background:#0e0e13;color:#ddd;text-align:left}.theme.active{border-color:var(--accent);color:var(--accent)}
 .notice{padding:12px 14px;border-radius:13px;background:#15140d;border:1px solid #4a401a;color:#ddd;font-size:13px;line-height:1.45}
-.secret-card{min-height:55vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;border-radius:30px;background:linear-gradient(145deg,#1a1a21,#0b0b0f);border:1px solid #34343e;position:relative;overflow:hidden}.secret-card:before{content:"";position:absolute;inset:-30%;background:radial-gradient(circle,#f4c43018,transparent 55%);pointer-events:none}.player-number{color:var(--muted);font-size:13px}.player-name{font-size:clamp(38px,11vw,66px);font-weight:1000;letter-spacing:-.05em;margin:12px 0 35px;position:relative}.hold{width:min(92%,380px);height:92px;border-radius:22px;background:var(--accent);color:#111;font-size:17px;font-weight:1000;position:relative;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:none}.hold .progress{position:absolute;inset:0;width:0;background:#fff6;pointer-events:none}.hold span{position:relative;z-index:2}.secret{margin-top:22px;font-size:clamp(30px,9vw,52px);font-weight:1000;min-height:66px;display:flex;align-items:center;justify-content:center;position:relative}.secret.impostor{color:#ff6571;text-shadow:0 0 24px #ff4d5d33}.secret.word{color:var(--accent)}.hidden{visibility:hidden}.next-wrap{width:100%;margin-top:15px}
+.secret-card{min-height:55vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;border-radius:30px;background:linear-gradient(145deg,#1a1a21,#0b0b0f);border:1px solid #34343e;position:relative;overflow:hidden}.secret-card:before{content:"";position:absolute;inset:-30%;background:radial-gradient(circle,#f4c43018,transparent 55%);pointer-events:none}.player-number{color:var(--muted);font-size:13px}.player-name{font-size:clamp(38px,11vw,66px);font-weight:1000;letter-spacing:-.05em;margin:12px 0 35px;position:relative}.hold{width:min(92%,380px);height:92px;border-radius:22px;background:var(--accent);color:#111;font-size:17px;font-weight:1000;position:relative;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:none}.hold .progress{position:absolute;inset:0;width:0;background:#fff6;pointer-events:none}.hold span{position:relative;z-index:2}.secret{margin-top:15px;font-size:clamp(22px,7vw,38px);font-weight:1000;min-height:66px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}.secret.impostor{color:#ff6571;text-shadow:0 0 24px #ff4d5d33}.secret.shield{color:#52e39b;text-shadow:0 0 24px #52e39b33}.secret.word{color:var(--accent)}.hidden{visibility:hidden}.next-wrap{width:100%;margin-top:15px}
 .wheel{height:240px;border-radius:26px;background:#0d0d12;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}.wheel-name{font-size:clamp(30px,9vw,56px);font-weight:1000;text-align:center;padding:20px}.result{text-align:center;padding:24px 0}.result-name{font-size:clamp(44px,13vw,82px);font-weight:1000;color:var(--accent);line-height:.95;margin:18px 0}
 .back{background:none;color:var(--muted);padding:10px 0;font-weight:800}.footer-note{text-align:center;color:#777;font-size:11px;margin-top:25px}
-.guess-box{margin:12px 0;text-align:left;background:#0b0b0f;padding:12px;border-radius:12px;border:1px solid var(--line)}
-.guess-box select{margin-top:6px}
+.elimination-list{display:flex;flex-direction:column;gap:10px;margin-top:15px}
+.elim-btn{background:#18181f;border:1px solid var(--line);padding:14px;border-radius:12px;color:#fff;font-weight:bold;text-align:left;display:flex;justify-content:space-between;align-items:center}
+.elim-btn.eliminated{background:#211216;border-color:#4d1b22;color:#ff9da7;text-decoration:line-through;opacity:0.6;pointer-events:none}
+.winner-banner{font-size:clamp(28px,8vw,52px);font-weight:1000;text-align:center;margin:10px 0 20px;line-height:1.1;letter-spacing:-.03em;text-transform:uppercase}
+.winner-banner.win-good{color:var(--ok);text-shadow:0 0 30px #52e39b33}
+.winner-banner.win-bad{color:var(--danger);text-shadow:0 0 30px #ff4d5d33}
 @media(min-width:600px){.themes{grid-template-columns:repeat(3,1fr)}.grid{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
@@ -62,7 +66,11 @@ label{display:block;color:#ddd;font-weight:800;font-size:14px;margin:16px 0 7px}
       </button>
       <button class="option" id="gameModePair" onclick="setGameType('pair')">
         <strong>Arroz e Feijão</strong>
-        <span>Todos recebem palavras do mesmo tema, mas só 1 dupla ou trio tem a palavra igual!</span>
+        <span>Apenas 1 dupla/trio tem a palavra secreta! Todo o resto é impostor sem se conhecer.</span>
+      </button>
+      <button class="option" id="gameModeShield" onclick="setGameType('shield')">
+        <strong>Escudo Humano</strong>
+        <span>2 normais, 1 impostor e 1 escudo humano que tenta ser eliminado!</span>
       </button>
     </div>
     <button class="primary" onclick="goFromModeSelect()">CONTINUAR</button>
@@ -116,29 +124,31 @@ label{display:block;color:#ddd;font-weight:800;font-size:14px;margin:16px 0 7px}
   <section id="playing" class="screen">
     <div class="hero" style="padding:6vh 0 3vh">
       <div style="font-size:54px">🎭</div>
-      <h1>Agora é com vocês!</h1>
-      <p id="playingText"></p>
-      <button class="primary" onclick="finishGame()">PARTIDA FINALIZADA</button>
+      <h1>Partida em Andamento!</h1>
+      <p id="playingText">Dêem suas dicas presencialmente. Quando terminar a rodada de dicas, vá para a votação de eliminação.</p>
+      <button class="primary" onclick="startElimination()">IR PARA VOTAÇÃO / ELIMINAÇÃO</button>
     </div>
   </section>
 
-  <section id="revealPairs" class="screen">
-    <h1>Resultados: Arroz e Feijão</h1>
-    <p>Selecione quem cada pessoa achava que era sua dupla/trio para ver se acertaram!</p>
-    <div id="guessesList"></div>
-    <button class="primary" onclick="showPairResults()">REVELAR QUEM ERA A DUPLA/TRIO</button>
-    <div id="pairResultBox" class="card" style="display:none;margin-top:20px;text-align:center">
-      <h2>A Dupla/Trio Real era:</h2>
-      <div id="realPairNames" style="font-size:24px;font-weight:900;color:var(--accent);margin:15px 0"></div>
-      <p id="realWordText" style="color:#fff;font-weight:bold"></p>
-      <div id="guessesFeedback" style="text-align:left;margin-top:15px"></div>
+  <section id="elimination" class="screen">
+    <h1>Eliminação da Rodada</h1>
+    <p id="elimSub">Selecione quem foi votado para ser eliminado nesta rodada:</p>
+    <div class="card">
+      <div class="elimination-list" id="elimList"></div>
     </div>
-    <button class="secondary" id="btnFinishPair" style="display:none" onclick="go('finish')">ENCERRAR PARTIDA</button>
+    <div class="notice" id="elimStatus" style="margin-bottom:12px"></div>
+    <button class="primary" id="btnEndGame" onclick="finishGame()">FINALIZAR E REVELAR RESULTADOS</button>
+  </section>
+
+  <section id="revealPairs" class="screen">
+    <h1>Fim de Jogo!</h1>
+    <div id="gameSummary" class="card"></div>
+    <button class="primary" onclick="go('finish')">ENCERRAR PARTIDA</button>
   </section>
 
   <section id="bank" class="screen">
     <button class="back" onclick="go('home')">← Voltar</button>
-    <h1>Banco de palavras</h1><p>Adicione, organize ou remova palavras do seu próprio banco. As alterações ficam salvas neste navegador.</p>
+    <h1>Banco de palavras</h1><p>Adicione, organize ou remova palavras do seu próprio banco.</p>
     <div class="card">
       <label>Nova palavra</label>
       <input id="newWord" placeholder="Ex.: Dinossauro">
@@ -158,10 +168,10 @@ label{display:block;color:#ddd;font-weight:800;font-size:14px;margin:16px 0 7px}
     <button class="back" onclick="go('home')">← Voltar</button>
     <h1>Como jogar</h1>
     <div class="card">
-      <h2>1. Configure</h2><p>Coloque os nomes, escolha o modo de jogo (Tradicional ou Arroz e Feijão) e selecione o tema.</p>
-      <h2>2. Modo Arroz e Feijão</h2><p>Neste modo, TODOS recebem palavras do mesmo tema. Mas só UMA DUPLA (ou trio) tem a palavra exatamente igual! Todos tentam achar seu par durante as dicas.</p>
-      <h2>3. Passe o celular</h2><p>Cada jogador verá seu nome. Ele deve segurar o botão para descobrir a palavra.</p>
-      <h2>4. Sorteio & Jogo</h2><p>O site sorteia quem começa a dar a dica. Falem suas dicas sem dar na cara e descubram quem combina com quem!</p>
+      <h2>1. Configure</h2><p>Coloque os nomes, escolha o modo de jogo e a quantidade de impostores.</p>
+      <h2>2. Arroz e Feijão</h2><p>Apenas 1 dupla ou trio sabe a palavra. Todos os outros são impostores e NÃO sabem quem são seus aliados!</p>
+      <h2>3. Escudo Humano</h2><p>2 jogadores normais sabem a palavra. 1 impostor tenta sobreviver. 1 escudo humano não sabe a palavra e tem que FAZER DE TUDO para ser eliminado no lugar do impostor!</p>
+      <h2>4. Eliminação Solitária</h2><p>Partidas com apenas 1 Impostor têm exatamente 1 eliminação antes de revelar os resultados!</p>
     </div>
   </section>
 
@@ -175,7 +185,15 @@ label{display:block;color:#ddd;font-weight:800;font-size:14px;margin:16px 0 7px}
 </div>
 
 <script>
-const WORDS = {"Jogos e franquias":["Minecraft","Roblox","Fortnite","Free Fire","GTA","FIFA / EA Sports FC","PES / eFootball","Call of Duty","PUBG","Counter-Strike","League of Legends","Valorant","Among Us","Pokémon","Super Mario Bros.","Sonic","Pac-Man","Tetris","Mortal Kombat","Street Fighter","Tekken","God of War","The Last of Us","Red Dead Redemption","Grand Theft Auto","Halo","Forza Horizon","Need for Speed","Rocket League","Fall Guys","Terraria","Stardew Valley","Undertale","Friday Night Funkin'","Subway Surfers","Candy Crush","Clash of Clans","Clash Royale","Brawl Stars","Angry Birds","Plants vs. Zombies","Just Dance","The Sims","Resident Evil","Assassin's Creed","Zelda","Donkey Kong","Wii Sports","Super Smash Bros."],"Comidas e Bebidas":["Pizza","Hambúrguer","Batata frita","Cachorro-quente","Lasanha","Macarrão","Sushi","Tacos","Burrito","Nachos","Churrasco","Feijoada","Arroz e feijão","Coxinha","Pão de queijo","Pastel","Brigadeiro","Açaí","Tapioca","Pão","Croissant","Panqueca","Waffle","Donut","Cookie","Bolo","Sorvete","Chocolate","Pipoca","Frango frito","Nuggets","Purê de batata","Omelete","Ovos fritos","Salada","Sopa","Ramen","Yakisoba","Empanada","Queijo","Costela","Milho","Coca-Cola","Pepsi","Guaraná","Fanta","Sprite","Red Bull","Monster","Gatorade","Água","Água com gás","Suco de laranja","Suco de limão","Suco de uva","Suco de maracujá","Suco de manga","Suco de morango","Limonada","Chá","Café","Café com leite","Cappuccino","Chocolate quente","Milkshake","Água de coco","Água tônica","Leite","Achocolatado","Caldo de cana","Margarita","Caipirinha","Cerveja","Vinho","Champagne"],"Lugares":["Mercado","Supermercado","Shopping","Banco","Farmácia","Hospital","Escola","Faculdade","Restaurante","Lanchonete","Padaria","Pizzaria","Hamburgueria","Sorveteria","Cafeteria","Bar","Loja de roupas","Loja de eletrônicos","Loja de brinquedos","Loja de móveis","Loja de materiais de construção","Pet shop","Salão de beleza","Barbearia","Academia","Cinema","Teatro","Parque","Praça","Posto de gasolina","Oficina mecânica","Lava-rápido","Estacionamento","Aeroporto","Estação de trem","Estação de metrô","Delegacia","Corpo de bombeiros","Prefeitura","Correios","Igreja","Hotel","Motel","Biblioteca","Museu","Estádio","Parque de diversões","Feira"],"Países":["Brasil","Estados Unidos","Canadá","México","Argentina","Chile","Colômbia","Peru","Reino Unido","França","Alemanha","Itália","Espanha","Portugal","Países Baixos","Bélgica","Suíça","Áustria","Grécia","Rússia","Ucrânia","Turquia","Egito","África do Sul","Nigéria","Marrocos","Japão","China","Coreia do Sul","Índia","Tailândia","Vietnã","Indonésia","Filipinas","Singapura","Austrália","Nova Zelândia","Arábia Saudita","Emirados Árabes Unidos","Israel","Irã","Iraque","Paquistão","Polônia","Suécia","Noruega","Dinamarca","Finlândia","Irlanda","Islândia"],"Objetos":["Cadeira","Mesa","Sofá","Cama","Travesseiro","Cobertor","Colchão","Guarda-roupa","Armário","Prateleira","Banco","Poltrona","Escrivaninha","Aparador","Cômoda","Cabide","Espelho","Tapete","Cortina","Almofada","Abajur","Luminária","Ventilador","Aquecedor","Relógio","Quadro","Porta-retrato","Vaso","Cesto","Lixeira","Caixa","Baú","Cofre","Chave","Fechadura","Maçaneta","Campainha","Guarda-chuva","Lanterna","Vela","Isqueiro","Fósforo","Filtro de linha","Televisão","Controle remoto","Computador","Notebook","Tablet","Celular","Smartphone","Monitor","Teclado","Mouse","Mousepad","Webcam","Microfone","Fone de ouvido","Headset","Caixa de som","Alto-falante","Impressora","Projetor","Roteador","Pen drive","HD","SSD","Cartão de memória","Carregador","Bateria","Pilha","Joystick","Controle de videogame","Console","Câmera","Tripé","Drone","Smartwatch","Calculadora","Rádio","GPS","MP3 player","Gravador","Reprodutor de DVD","Geladeira","Freezer","Fogão","Forno","Micro-ondas","Air fryer","Liquidificador","Cafeteira","Chaleira","Torradeira","Sanduicheira","Espremedor","Panela","Frigideira","Assadeira","Forma de bolo","Travessa","Tigela","Prato","Copo","Taça","Xícara","Garrafa","Jarra","Garfo","Faca","Colher","Colher de pau","Espátula","Peneira","Ralador","Abridor de lata","Tábua de corte","Funil","Pote","Panela de pressão","Marmita","Garrafa térmica","Porta-copos","Saleiro","Escorredor de pratos","Luva de forno","Avental","Papel-alumínio","Filme plástico","Guardanapo","Papel-toalha","Toalha de mesa","Copo térmico","Canudo","Palito","Espeto","Churrasqueira","Grelha","Timer","Forma de gelo","Esponja","Detergente","Sabão","Pano de prato","Rodo","Vassoura","Pá","Balde","Escova de dentes","Pasta de dentes","Fio dental","Sabonete","Shampoo","Condicionador","Bucha","Toalha","Roupão","Escova de cabelo","Pente","Secador de cabelo","Chapinha","Barbeador","Máquina de cortar cabelo","Tesoura","Cortador de unhas","Pinça","Desodorante","Perfume","Creme hidratante","Protetor solar","Algodão","Cotonete","Papel higiênico","Tapete de banheiro","Escova sanitária","Desentupidor","Cesto de roupa","Pregador de roupa","Varal","Ferro de passar","Tábua de passar","Máquina de lavar","Aspirador de pó","Esfregão","Camisa","Blusa","Moletom","Casaco","Jaqueta","Calça","Shorts","Bermuda","Saia","Vestido","Terno","Gravata","Cinto","Meia","Cueca","Calcinha","Sutiã","Pijama","Biquíni","Boné","Chapéu","Gorro","Cachecol","Luva","Tênis","Chinelo","Bota","Chuteira","Pantufa","Mochila","Bolsa","Carteira","Mala","Óculos","Óculos de sol","Pulseira","Colar","Brinco","Anel","Elástico de cabelo","Caderno","Livro","Jornal","Diário","Pasta","Envelope","Folha de papel","Cartolina","Papelão","Lápis","Lapiseira","Caneta","Canetinha","Giz de cera","Borracha","Apontador","Régua","Cola","Fita adesiva","Grampeador","Apagador","Pincel","Tinta","Estojo","Lancheira","Estilete","Etiqueta","Carimbo","Bola de futebol","Bola de basquete","Bola de vôlei","Bola de tênis","Raquete","Skate","Patins","Bicicleta","Capacete","Patinete","Pipa","Corda","Bambolê","Peteca","Dardo","Arco","Flecha","Rede","Trampolim","Apito","Cronômetro","Medalha","Troféu","Tabuleiro","Dado","Peão","Dominó","Baralho","Xadrez","Dama","Ioiô","Pião","Cubo mágico","Boneco","Urso de pelúcia","Carrinho de brinquedo","Lego","Bola de gude","Videogame portátil","Cartas colecionáveis","Pistola de água"],"Pessoas Reais":["Neymar Jr","Pelé","Jeffrey Epstein","Vini Jr","Lebron James","Lazáro Barbosa","Messi","Cristiano Ronaldo","Maradona","Trump","Lula Presidente","Bolsonaro","Renato Cariane","Bistecone","Alanzoka","Galvão Bueno","Davy Jones","Raulzito","Nobru","Travis Scott","Kanye West","Matuê","Péricles","Drake","Albert Eisntein","Tiaguinho","Julio Balestrini","Mr Beast","Puff Daddy","Virgínia","Anita","Ocastrin","Sabrina Carpinter","Luciano Hulk","Ana Maria Braga","Yuri Alberto","Obama","Michael Jackson","Ronaldinho","Ronaldo Fênomeno","Romário","Buzeira","MC Ryan SP","Mia Kalifha","Michael Jordan","Kylian Mbappé","Halland","Coringa streamer","Luan Gameplay","Leon coisa de nerd","BRKSEDU","Flakes Power","Lamine Yamal","Raphinha","Monark","Igor3K","Authentic Games","IshowSpeed","Elon Musk","Aldof Hitler","Pedro Álvares Cabral","Josef Stalin"]};
+const WORDS = {
+  "Jogos e franquias":["Minecraft","Roblox","Fortnite","Free Fire","GTA","FIFA / EA Sports FC","PES / eFootball","Call of Duty","PUBG","Counter-Strike","Valorant","Among Us","Pokémon","Super Mario Bros.","Sonic","Pac-Man","Tetris","Mortal Kombat","Street Fighter","Tekken","God of War","The Last of Us","Red Dead Redemption","Grand Theft Auto","Halo","Forza Horizon","Need for Speed","Rocket League","Fall Guys","Terraria","Stardew Valley","Undertale","Friday Night Funkin'","Subway Surfers","Candy Crush","Clash of Clans","Clash Royale","Brawl Stars","Angry Birds","Plants vs. Zombies","Just Dance","The Sims","Resident Evil","Assassin's Creed","Zelda","Donkey Kong","Wii Sports","Super Smash Bros."],
+  "Comidas e Bebidas":["Pizza","Hambúrguer","Batata frita","Cachorro-quente","Lasanha","Macarrão","Sushi","Tacos","Burrito","Nachos","Churrasco","Feijoada","Arroz e feijão","Coxinha","Pão de queijo","Pastel","Brigadeiro","Açaí","Tapioca","Pão","Croissant","Panqueca","Waffle","Donut","Cookie","Bolo","Sorvete","Chocolate","Pipoca","Frango frito","Nuggets","Purê de batata","Omelete","Ovos fritos","Salada","Sopa","Ramen","Yakisoba","Empanada","Queijo","Costela","Milho","Coca-Cola","Pepsi","Guaraná","Fanta","Sprite","Red Bull","Monster","Gatorade","Água","Água com gás","Suco de laranja","Suco de limão","Suco de uva","Suco de maracujá","Suco de manga","Suco de morango","Limonada","Chá","Café","Café com leite","Cappuccino","Chocolate quente","Milkshake","Água de coco","Água tônica","Leite","Achocolatado","Caldo de cana","Margarita","Caipirinha","Cerveja","Vinho","Champagne"],
+"Lugares":["Mercado","Supermercado","Shopping","Banco","Farmácia","Hospital","Escola","Faculdade","Restaurante","Lanchonete","Padaria","Pizzaria","Hamburgueria","Sorveteria","Cafeteria","Bar","Loja de roupas","Loja de eletrônicos","Loja de brinquedos","Loja de móveis","Loja de materiais de construção","Pet shop","Salão de beleza","Barbearia","Academia","Cinema","Teatro","Parque","Praça","Posto de gasolina","Oficina mecânica","Lava-rápido","Estacionamento","Aeroporto","Estação de trem","Estação de metrô","Delegacia","Corpo de bombeiros","Prefeitura","Correios","Igreja","Hotel","Motel","Biblioteca","Museu","Estádio","Parque de diversões","Feira"],
+  "Países":["Brasil","Estados Unidos","Canadá","México","Argentina","Chile","Colômbia","Peru","Reino Unido","França","Alemanha","Itália","Espanha","Portugal","Países Baixos","Bélgica","Suíça","Áustria","Grécia","Rússia","Ucrânia","Turquia","Egito","África do Sul","Nigéria","Marrocos","Japão","China","Coreia do Sul","Índia","Tailândia","Vietnã","Indonésia","Filipinas","Singapura","Austrália","Nova Zelândia","Arábia Saudita","Emirados Árabes Unidos","Israel","Irã","Iraque","Paquistão","Polônia","Suécia","Noruega","Dinamarca","Finlândia","Irlanda","Islândia"],
+  "Objetos":["Cadeira","Mesa","Sofá","Cama","Travesseiro","Cobertor","Colchão","Guarda-roupa","Armário","Prateleira","Banco","Poltrona","Escrivaninha","Aparador","Cômoda","Cabide","Espelho","Tapete","Cortina","Almofada","Abajur","Luminária","Ventilador","Aquecedor","Relógio","Quadro","Porta-retrato","Vaso","Cesto","Lixeira","Caixa","Baú","Cofre","Chave","Fechadura","Maçaneta","Campainha","Guarda-chuva","Lanterna","Vela","Isqueiro","Fósforo","Filtro de linha","Televisão","Controle remoto","Computador","Notebook","Tablet","Celular","Smartphone","Monitor","Teclado","Mouse","Mousepad","Webcam","Microfone","Fone de ouvido","Headset","Caixa de som","Alto-falante","Impressora","Projetor","Roteador","Pen drive","HD","SSD","Cartão de memória","Carregador","Bateria","Pilha","Joystick","Controle de videogame","Console","Câmera","Tripé","Drone","Smartwatch","Calculadora","Rádio","GPS","MP3 player","Gravador","Reprodutor de DVD","Geladeira","Freezer","Fogão","Forno","Micro-ondas","Air fryer","Liquidificador","Cafeteira","Chaleira","Torradeira","Sanduicheira","Espremedor","Panela","Frigideira","Assadeira","Forma de bolo","Travessa","Tigela","Prato","Copo","Taça","Xícara","Garrafa","Jarra","Garfo","Faca","Colher","Colher de pau","Espátula","Peneira","Ralador","Abridor de lata","Tábua de corte","Funil","Pote","Panela de pressão","Marmita","Garrafa térmica","Porta-copos","Saleiro","Escorredor de pratos","Luva de forno","Avental","Papel-alumínio","Filme plástico","Guardanapo","Papel-toalha","Toalha de mesa","Copo térmico","Canudo","Palito","Espeto","Churrasqueira","Grelha","Timer","Forma de gelo","Esponja","Detergente","Sabão","Pano de prato","Rodo","Vassoura","Pá","Balde","Escova de dentes","Pasta de dentes","Fio dental","Sabonete","Shampoo","Condicionador","Bucha","Toalha","Roupão","Escova de cabelo","Pente","Secador de cabelo","Chapinha","Barbeador","Máquina de cortar cabelo","Tesoura","Cortador de unhas","Pinça","Desodorante","Perfume","Creme hidratante","Protetor solar","Algodão","Cotonete","Papel higiênico","Tapete de banheiro","Escova sanitária","Desentupidor","Cesto de roupa","Pregador de roupa","Varal","Ferro de passar","Tábua de passar","Máquina de lavar","Aspirador de pó","Esfregão","Camisa","Blusa","Moletom","Casaco","Jaqueta","Calça","Shorts","Bermuda","Saia","Vestido","Terno","Gravata","Cinto","Meia","Cueca","Calcinha","Sutiã","Pijama","Biquíni","Boné","Chapéu","Gorro","Cachecol","Luva","Tênis","Chinelo","Bota","Chuteira","Pantufa","Mochila","Bolsa","Carteira","Mala","Óculos","Óculos de sol","Pulseira","Colar","Brinco","Anel","Elástico de cabelo","Caderno","Livro","Jornal","Diário","Pasta","Envelope","Folha de papel","Cartolina","Papelão","Lápis","Lapiseira","Caneta","Canetinha","Giz de cera","Borracha","Apontador","Régua","Cola","Fita adesiva","Grampeador","Apagador","Pincel","Tinta","Estojo","Lancheira","Estilete","Etiqueta","Carimbo","Bola de futebol","Bola de basquete","Bola de vôlei","Bola de tênis","Raquete","Skate","Patins","Bicicleta","Capacete","Patinete","Pipa","Corda","Bambolê","Peteca","Dardo","Arco","Flecha","Rede","Trampolim","Apito","Cronômetro","Medalha","Troféu","Tabuleiro","Dado","Peão","Dominó","Baralho","Xadrez","Dama","Ioiô","Pião","Cubo mágico","Boneco","Urso de pelúcia","Carrinho de brinquedo","Lego","Bola de gude","Videogame portátil","Cartas colecionáveis","Pistola de água"],
+  "Famosos e Personalidades":["Neymar Jr","Pelé","Vini Jr","Lebron James","Messi","Cristiano Ronaldo","Maradona","Ayrton Senna","Marta","Ronaldo Fenômeno","Ronaldinho Gaúcho","Michael Jordan","Kylian Mbappé","Haaland","Silvio Santos","Faustão","Xuxa","Luciano Huck","Ana Maria Braga","Rodrigo Faro","Casimiro","Alanzoka","Gaules","MrBeast","Whindersson Nunes","Felipe Neto","IShowSpeed","Elon Musk","Bill Gates","Mark Zuckerberg","Albert Einstein","Isaac Newton","Kanye West","Drake","Travis Scott","Beyoncé","Taylor Swift","Michael Jackson","Lady Gaga","Rihanna","Eminem","Justin Bieber","Ariana Grande","Lázaro Barbosa","P. Diddy","Jeffrey Epstein","Goleiro Bruno","Adolf Hitler","Robinho","Raulzito","Felca","Davy Jones","BRKSEDU","Leon (coisa de nerd)","Core(Youtuber)","Bluezão","Péricles"],
+  "Personagens fictícios":["Super Mario","Sonic","Homem aranha","Homem de Ferro","Hulk","Batman","Coringa","Robin","Goku","Veggeta","Frezza","Kratos","Luigi","Naruto","Sasuke","Venom","Thanos","Arlequina","Patrick Jane o Mentalista","Clarêncio","Finn (Hora de Aventura)","Jake (Hora de Aventura)","Titio Avô","Johnny Bravo","Zeus","Steve (Minecraft)","Homer Simpson","Peter Griffen","Garfield","Rigby (Apenas um Show)","Mordecai (Apenas um Show)","Musculoso (Apenas um Show)","Mickey","Pateta","Ben 10","Vô Max (Ben 10)","Gumball","Darwin","Coragem o Cão Covarde"],
+};
 
 const state = {
   players: ["Jogador 1","Jogador 2","Jogador 3","Jogador 4"],
@@ -183,14 +201,17 @@ const state = {
   pairGroupSize: 2,
   impostors: 1, mode: "all", theme: null, 
   assignedWords: [],
+  assignedSubtexts: [],
   roles: [], index: 0,
   seenWord: false, lastWord: null, winner: null, wordTheme: null,
-  targetPairIndices: []
+  targetPairIndices: [],
+  eliminated: [],
+  eliminationCount: 0
 };
 
 let CUSTOM_WORDS = loadCustomWords();
 const $ = id => document.getElementById(id);
-const screens = ["home","players","modeSelect","impostors","words","reveal","draw","playing","revealPairs","how","finish"];
+const screens = ["home","players","modeSelect","impostors","words","reveal","draw","playing","elimination","revealPairs","bank","how","finish"];
 
 function loadCustomWords(){
   try{return JSON.parse(localStorage.getItem("impostor_custom_words")||"[]")}catch(e){return []}
@@ -220,7 +241,7 @@ function escapeHtml(v){return v.replace(/[&<>\"]/g,m=>({"&":"&amp;","<":"&lt;","
 
 function go(id){
   screens.forEach(s=>$(s).classList.toggle("active",s===id));
-  const labels={home:"",players:"1 / 4",modeSelect:"2 / 4",impostors:"3 / 4",words:"4 / 4",reveal:"Cartas",draw:"Sorteio",playing:"Jogo",revealPairs:"Votação",how:"",bank:"",finish:""};
+  const labels={home:"",players:"1 / 4",modeSelect:"2 / 4",impostors:"3 / 4",words:"4 / 4",reveal:"Cartas",draw:"Sorteio",playing:"Jogo",elimination:"Votação",revealPairs:"Resultado",how:"",bank:"",finish:""};
   $("step").textContent=labels[id]||"";
   if(id==="bank") renderBank();
   if(id==="players") renderPlayers();
@@ -262,45 +283,66 @@ function setGameType(type){
   state.gameType = type;
   $("gameModeClassic").classList.toggle("selected", type==="classic");
   $("gameModePair").classList.toggle("selected", type==="pair");
+  $("gameModeShield").classList.toggle("selected", type==="shield");
 }
 
 function goFromModeSelect(){
   if(state.gameType === "pair" && state.players.length < 4){
     return alert("O modo Arroz e Feijão precisa de no mínimo 4 jogadores!");
   }
+  if(state.gameType === "shield" && state.players.length !== 4){
+    return alert("O modo Escudo Humano foi feito para exatamente 4 jogadores (2 Normais, 1 Impostor e 1 Escudo Humano)!");
+  }
   go("impostors");
 }
 
 function renderImpostors(){
   $("impOptions").innerHTML="";
+  const count = state.players.length;
+
   if(state.gameType === "classic"){
     $("impTitle").textContent = "Quantos impostores?";
     $("impSub").textContent = "Escolha quantos jogadores ficarão sem a palavra.";
-    const max=Math.max(1,Math.min(6,Math.floor(state.players.length/3)));
-    if(state.impostors>max) state.impostors=max;
-    for(let n=1;n<=max;n++){
+    
+    let max = 1;
+    if(count >= 6) max = 3;
+    else if(count >= 4) max = 2;
+
+    if(state.impostors > max) state.impostors = 1;
+
+    for(let n=1; n<=max; n++){
       const b=document.createElement("button"); b.className="option"+(n===state.impostors?" selected":"");
-      b.innerHTML=`<strong>${n} impostor${n>1?"es":""}</strong><span>${n===1?"Recomendado para grupos menores":"Partida mais caótica"}</span>`;
-      b.onclick=()=>{state.impostors=n;renderImpostors()}; $("impOptions").appendChild(b);
+      b.innerHTML=`<strong>${n} impostor${n>1?"es":""}</strong><span>${n===1?"1 eliminação única na partida":"Partida com eliminações múltiplas"}</span>`;
+      b.onclick=()=>{state.impostors=n;renderImpostors()}; 
+      $("impOptions").appendChild(b);
     }
-    $("impHint").textContent=`Para ${state.players.length} jogadores, recomendamos ${Math.min(2,Math.max(1,Math.floor(state.players.length/4)))} impostor${Math.min(2,Math.max(1,Math.floor(state.players.length/4)))>1?"es":""}.`;
-  } else {
+    $("impHint").textContent=`Para ${count} jogadores, você pode escolher até ${max} impostor(es). Com 1 impostor, haverá apenas 1 eliminação no jogo!`;
+  } else if(state.gameType === "pair") {
     $("impTitle").textContent = "Modo Arroz e Feijão";
-    $("impSub").textContent = "Escolha a formação do par verdadeiro:";
+    $("impSub").textContent = "Escolha o tamanho do grupo do bem:";
     
     const b2=document.createElement("button"); b2.className="option"+(state.pairGroupSize===2?" selected":"");
-    b2.innerHTML=`<strong>Dupla (2 com palavra igual)</strong><span>Mínimo 4 pessoas. Todos os outros têm palavras diferentes.</span>`;
+    b2.innerHTML=`<strong>Dupla (2 sabendo a palavra)</strong><span>${count - 2} impostores no resto do grupo.</span>`;
     b2.onclick=()=>{state.pairGroupSize=2;renderImpostors()}; $("impOptions").appendChild(b2);
 
-    if(state.players.length >= 5){
+    if(count >= 5){
       const b3=document.createElement("button"); b3.className="option"+(state.pairGroupSize===3?" selected":"");
-      b3.innerHTML=`<strong>Trio (3 com palavra igual)</strong><span>Mínimo 5 pessoas. Todos os outros têm palavras diferentes.</span>`;
+      b3.innerHTML=`<strong>Trio (3 sabendo a palavra)</strong><span>${count - 3} impostores no resto do grupo.</span>`;
       b3.onclick=()=>{state.pairGroupSize=3;renderImpostors()}; $("impOptions").appendChild(b3);
     } else {
       if(state.pairGroupSize === 3) state.pairGroupSize = 2;
     }
 
-    $("impHint").textContent = `Neste modo, apenas ${state.pairGroupSize} pessoas terão a mesma palavra. Todos as outras pessoas terão palavras diferentes dentro do mesmo tema!`;
+    $("impHint").textContent = `Neste modo, APENAS ${state.pairGroupSize} pessoas saberão a palavra secreta! Todos os outros ${count - state.pairGroupSize} jogadores serão IMPOSTORES (sem saberem quem são os outros).`;
+  } else if(state.gameType === "shield") {
+    $("impTitle").textContent = "Modo Escudo Humano";
+    $("impSub").textContent = "Regras fixas da partida:";
+    
+    const b=document.createElement("button"); b.className="option selected";
+    b.innerHTML=`<strong>4 Jogadores</strong><span>2 Normais | 1 Impostor | 1 Escudo Humano</span>`;
+    $("impOptions").appendChild(b);
+
+    $("impHint").textContent = `O Impostor quer sobreviver. O Escudo Humano NÃO sabe a palavra e ganha se for ELIMINADO no lugar do Impostor! Haverá apenas 1 eliminação única.`;
   }
 }
 
@@ -326,52 +368,53 @@ function setupWordsAndRoles(){
   }
   if(!pool.length) throw new Error("Banco de palavras vazio para essa seleção.");
 
+  let entry = pool[Math.floor(Math.random()*pool.length)];
+  if(pool.length > 1 && entry.word === state.lastWord) entry = pool[(pool.findIndex(x=>x.word===entry.word)+1)%pool.length];
+  state.lastWord = entry.word; 
+  state.wordTheme = entry.theme;
+
+  state.eliminated = Array(state.players.length).fill(false);
+  state.assignedSubtexts = Array(state.players.length).fill("");
+  state.eliminationCount = 0;
+
   if(state.gameType === "classic"){
-    let entry = pool[Math.floor(Math.random()*pool.length)];
-    if(pool.length > 1 && entry.word === state.lastWord) entry = pool[(pool.findIndex(x=>x.word===entry.word)+1)%pool.length];
-    state.lastWord = entry.word; 
-    state.wordTheme = entry.theme;
-    
     const ids = shuffle([...Array(state.players.length).keys()]);
     state.roles = Array(state.players.length).fill("normal");
     ids.slice(0, state.impostors).forEach(i => state.roles[i] = "impostor");
     
     state.assignedWords = state.players.map((_, i) => state.roles[i] === "impostor" ? "VOCÊ É O IMPOSTOR" : entry.word);
-  } else {
-    let chosenTheme = state.theme;
-    if(!chosenTheme){
-      const themesAvailable = [...new Set(pool.map(x => x.theme))];
-      chosenTheme = themesAvailable[Math.floor(Math.random()*themesAvailable.length)];
-    }
-    state.wordTheme = chosenTheme;
-
-    let themeWords = pool.filter(x => x.theme === chosenTheme).map(x => x.word);
-    themeWords = [...new Set(themeWords)];
-
-    if(themeWords.length < (state.players.length - state.pairGroupSize + 1)){
-      alert("O tema escolhido não tem palavras suficientes para todos os jogadores terem palavras distintas! Escolha outro tema ou adicione palavras.");
-      return false;
-    }
-
-    shuffle(themeWords);
-    const mainWord = themeWords.pop();
-    state.lastWord = mainWord;
-
+  } else if(state.gameType === "pair"){
     const playerIndices = shuffle([...Array(state.players.length).keys()]);
     state.targetPairIndices = playerIndices.slice(0, state.pairGroupSize);
 
-    state.assignedWords = Array(state.players.length).fill(null);
-    state.roles = Array(state.players.length).fill("normal");
+    state.assignedWords = Array(state.players.length).fill("VOCÊ É O IMPOSTOR");
+    state.roles = Array(state.players.length).fill("impostor");
 
     state.targetPairIndices.forEach(idx => {
-      state.assignedWords[idx] = mainWord;
+      state.assignedWords[idx] = entry.word;
+      state.roles[idx] = "normal";
     });
+  } else if(state.gameType === "shield"){
+    const ids = shuffle([...Array(state.players.length).keys()]);
+    state.roles = Array(4).fill("normal");
+    state.roles[ids[0]] = "normal";
+    state.roles[ids[1]] = "normal";
+    state.roles[ids[2]] = "impostor";
+    state.roles[ids[3]] = "shield";
 
-    for(let i=0; i<state.players.length; i++){
-      if(state.assignedWords[i] === null){
-        state.assignedWords[i] = themeWords.pop();
+    state.assignedWords = Array(4).fill("");
+    state.assignedSubtexts = Array(4).fill("");
+
+    state.roles.forEach((role, i) => {
+      if(role === "normal") state.assignedWords[i] = entry.word;
+      else if(role === "impostor") {
+        state.assignedWords[i] = "VOCÊ É O IMPOSTOR";
+        state.assignedSubtexts[i] = "Tente sobreviver sem dar pistas de que não sabe a palavra!";
+      } else if(role === "shield") {
+        state.assignedWords[i] = "VOCÊ É O ESCUDO HUMANO";
+        state.assignedSubtexts[i] = "Você NÃO sabe a palavra! Seu objetivo é parecer suspeito para SER ELIMINADO e proteger o Impostor!";
       }
-    }
+    });
   }
   return true;
 }
@@ -423,10 +466,15 @@ function revealSecret(){
   clearInterval(holdTimer);holdTimer=null;state.seenWord=true;
   const s=$("secret");
   const word = state.assignedWords[state.index];
+  const subtext = state.assignedSubtexts[state.index];
+  const role = state.roles[state.index];
   
-  if(word === "VOCÊ É O IMPOSTOR"){
-    s.textContent = word;
+  if(role === "impostor"){
+    s.innerHTML = `<div>${word}</div>` + (subtext ? `<div style="font-size:14px;color:var(--muted);margin-top:8px">${subtext}</div>` : "");
     s.className = "secret impostor";
+  } else if(role === "shield"){
+    s.innerHTML = `<div>${word}</div>` + (subtext ? `<div style="font-size:14px;color:#fff;margin-top:8px">${subtext}</div>` : "");
+    s.className = "secret shield";
   } else {
     s.textContent = word;
     s.className = "secret word";
@@ -458,7 +506,7 @@ function runDraw(){
   
   const eligible = [];
   state.players.forEach((name, i) => {
-    const isImpostor = state.roles[i] === "impostor";
+    const isImpostor = state.roles[i] === "impostor" || state.roles[i] === "shield";
     const weight = isImpostor ? 1 : 5; 
     for (let w = 0; w < weight; w++) {
       eligible.push({ name, i });
@@ -481,75 +529,153 @@ function runDraw(){
   },70);
 }
 
-function finishGame(){
-  if(state.gameType === "pair"){
-    preparePairsReveal();
-    go("revealPairs");
-  } else {
-    go("finish");
+function startElimination(){
+  renderElimination();
+  go("elimination");
+}
+
+function renderElimination(){
+  const list = $("elimList");
+  list.innerHTML = "";
+  
+  let activeCount = 0;
+  state.players.forEach((name, i) => {
+    const isElim = state.eliminated[i];
+    if(!isElim) activeCount++;
+    
+    const btn = document.createElement("button");
+    btn.className = "elim-btn" + (isElim ? " eliminated" : "");
+    btn.innerHTML = `<span><b>${escapeHtml(name)}</b></span> <span>${isElim ? "ELIMINADO" : "ELIMINAR ❌"}</span>`;
+    btn.onclick = () => eliminatePlayer(i);
+    list.appendChild(btn);
+  });
+
+  let maxEliminations = 1;
+  if(state.gameType === "classic") maxEliminations = state.impostors;
+  else if(state.gameType === "pair") maxEliminations = state.players.length - state.pairGroupSize;
+  else if(state.gameType === "shield") maxEliminations = 1;
+
+  $("elimStatus").innerHTML = `Eliminações nesta partida: <b>${state.eliminationCount} / ${maxEliminations}</b>`;
+  $("elimSub").textContent = "Selecione quem foi votado para ser eliminado nesta rodada:";
+}
+
+function eliminatePlayer(index){
+  if(state.eliminated[index]) return;
+  const pName = state.players[index];
+  
+  if(confirm(`Confirmar eliminação de ${pName}?`)){
+    state.eliminated[index] = true;
+    state.eliminationCount++;
+    
+    let activeCount = 0;
+    state.players.forEach((_, i) => {
+      if(!state.eliminated[i]) activeCount++;
+    });
+
+    let maxEliminations = 1;
+    if(state.gameType === "classic") maxEliminations = state.impostors;
+    else if(state.gameType === "pair") maxEliminations = state.players.length - state.pairGroupSize;
+    else if(state.gameType === "shield") maxEliminations = 1;
+
+    if(state.eliminationCount >= maxEliminations || activeCount <= 2){
+      alert(`Fim das eliminações! Revelando os resultados da partida...`);
+      finishGame();
+    } else {
+      renderElimination();
+    }
   }
 }
 
-function preparePairsReveal(){
-  const box = $("guessesList");
+function finishGame(){
+  const box = $("gameSummary");
   box.innerHTML = "";
-  $("pairResultBox").style.display = "none";
-  $("btnFinishPair").style.display = "none";
+  let html = "";
 
-  state.players.forEach((pName, i) => {
-    const div = document.createElement("div");
-    div.className = "guess-box";
-    div.innerHTML = `<label>Quem <b>${escapeHtml(pName)}</b> acha que é sua dupla/trio?</label>`;
-    
-    const sel = document.createElement("select");
-    sel.id = `guess_${i}`;
-    sel.innerHTML = `<option value="">-- Selecione um jogador --</option>`;
-    
-    state.players.forEach((otherName, j) => {
-      if(i !== j){
-        sel.innerHTML += `<option value="${j}">${escapeHtml(otherName)}</option>`;
-      }
-    });
-    div.appendChild(sel);
-    box.appendChild(div);
-  });
-}
+  if(state.gameType === "classic"){
+    const eliminatedImpostors = state.players.filter((_, i) => state.roles[i] === "impostor" && state.eliminated[i]).length;
+    const allImpostorsEliminated = eliminatedImpostors === state.impostors;
 
-function showPairResults(){
-  const realNames = state.targetPairIndices.map(idx => state.players[idx]);
-  $("realPairNames").textContent = realNames.join(" & ");
-  $("realWordText").textContent = `Palavra secreta deles: "${state.lastWord}"`;
-
-  let feedbackHtml = "<h3>Palpites da galera:</h3>";
-  state.players.forEach((pName, i) => {
-    const sel = $(`guess_${i}`);
-    const chosenIdx = sel ? parseInt(sel.value) : -1;
-    
-    if(isNaN(chosenIdx) || chosenIdx < 0){
-      feedbackHtml += `<p><b>${escapeHtml(pName)}</b> não votou.</p>`;
+    if(allImpostorsEliminated){
+      html += `<div class="winner-banner win-good">JOGADORES VENCERAM!</div>`;
     } else {
-      const chosenName = state.players[chosenIdx];
-      const isTarget = state.targetPairIndices.includes(i);
-      const isChosenTarget = state.targetPairIndices.includes(chosenIdx);
-
-      let correct = false;
-      if(isTarget && isChosenTarget){
-        correct = true;
-      }
-
-      if(correct){
-        feedbackHtml += `<p>🟢 <b>${escapeHtml(pName)}</b> achou que era <b>${escapeHtml(chosenName)}</b> e <b style="color:var(--ok)">ACERTOU!</b></p>`;
-      } else {
-        feedbackHtml += `<p>🔴 <b>${escapeHtml(pName)}</b> achou que era <b>${escapeHtml(chosenName)}</b> e <b style="color:var(--danger)">ERROU!</b></p>`;
-      }
+      const impText = state.impostors > 1 ? "IMPOSTORES VENCERAM!" : "IMPOSTOR VENCEU!";
+      html += `<div class="winner-banner win-bad">${impText}</div>`;
     }
-  });
 
-  $("guessesFeedback").innerHTML = feedbackHtml;
-  $("pairResultBox").style.display = "block";
-  $("btnFinishPair").style.display = "block";
+    html += `<h2 style="color:var(--accent);margin-bottom:10px;text-align:center">A Palavra era: "${escapeHtml(state.lastWord)}"</h2>`;
+    html += `<p style="text-align:center"><b>Tema:</b> ${escapeHtml(state.wordTheme)}</p><hr style="border-color:var(--line);margin:15px 0">`;
+
+    html += `<h3>Revelação dos Papéis:</h3><ul style="text-align:left;line-height:1.8">`;
+    state.players.forEach((p, i) => {
+      const isImp = state.roles[i] === "impostor";
+      const isElim = state.eliminated[i];
+      const status = isElim ? "<span style='color:var(--danger)'>(Eliminado)</span>" : "<span style='color:var(--ok)'>(Sobreviveu)</span>";
+      html += `<li><b>${escapeHtml(p)}</b>: ${isImp ? "<b style='color:var(--danger)'>IMPOSTOR</b>" : "Jogador Normal"} ${status}</li>`;
+    });
+    html += `</ul>`;
+
+  } else if(state.gameType === "pair") {
+    const eliminatedPairMembers = state.targetPairIndices.filter(idx => state.eliminated[idx]).length;
+    const pairSurvived = eliminatedPairMembers === 0;
+
+    if(pairSurvived){
+      html += `<div class="winner-banner win-good">A DUPLA/TRIO VENCEU!</div>`;
+    } else {
+      html += `<div class="winner-banner win-bad">OS IMPOSTORES VENCERAM!</div>`;
+    }
+
+    html += `<h2 style="color:var(--accent);margin-bottom:10px;text-align:center">A Palavra era: "${escapeHtml(state.lastWord)}"</h2>`;
+    html += `<p style="text-align:center"><b>Tema:</b> ${escapeHtml(state.wordTheme)}</p><hr style="border-color:var(--line);margin:15px 0">`;
+
+    const realPairNames = state.targetPairIndices.map(idx => state.players[idx]).join(" & ");
+    html += `<h3 style="color:var(--ok)">Sabiam a palavra:</h3>`;
+    html += `<div style="font-size:20px;font-weight:900;color:var(--accent);margin:6px 0 15px">${escapeHtml(realPairNames)}</div>`;
+
+    html += `<h3>Status de Todos os Jogadores:</h3><ul style="text-align:left;line-height:1.8">`;
+    state.players.forEach((p, i) => {
+      const isTarget = state.targetPairIndices.includes(i);
+      const isElim = state.eliminated[i];
+      const status = isElim ? "<span style='color:var(--danger)'>(Eliminado)</span>" : "<span style='color:var(--ok)'>(Sobreviveu)</span>";
+      html += `<li><b>${escapeHtml(p)}</b>: ${isTarget ? "<b style='color:var(--accent)'>SABIA A PALAVRA</b>" : "<b style='color:var(--danger)'>IMPOSTOR</b>"} ${status}</li>`;
+    });
+    html += `</ul>`;
+
+  } else if(state.gameType === "shield") {
+    const shieldIdx = state.roles.indexOf("shield");
+    const impostorIdx = state.roles.indexOf("impostor");
+    const shieldEliminated = state.eliminated[shieldIdx];
+    const impostorEliminated = state.eliminated[impostorIdx];
+
+    if(shieldEliminated){
+      html += `<div class="winner-banner win-good">ESCUDO HUMANO VENCEU!</div>`;
+    } else if(impostorEliminated){
+      html += `<div class="winner-banner win-good">JOGADORES VANCERAM!</div>`;
+    } else {
+      html += `<div class="winner-banner win-bad">IMPOSTOR VENCEU!</div>`;
+    }
+
+    html += `<h2 style="color:var(--accent);margin-bottom:10px;text-align:center">A Palavra era: "${escapeHtml(state.lastWord)}"</h2>`;
+    html += `<p style="text-align:center"><b>Tema:</b> ${escapeHtml(state.wordTheme)}</p><hr style="border-color:var(--line);margin:15px 0">`;
+
+    html += `<h3>Revelação dos Papéis:</h3><ul style="text-align:left;line-height:1.8">`;
+    state.players.forEach((p, i) => {
+      const role = state.roles[i];
+      const isElim = state.eliminated[i];
+      const status = isElim ? "<span style='color:var(--danger)'>(Eliminado)</span>" : "<span style='color:var(--ok)'>(Sobreviveu)</span>";
+      
+      let roleLabel = "Jogador Normal";
+      if(role === "impostor") roleLabel = "<b style='color:var(--danger)'>IMPOSTOR</b>";
+      if(role === "shield") roleLabel = "<b style='color:var(--ok)'>ESCUDO HUMANO</b>";
+
+      html += `<li><b>${escapeHtml(p)}</b>: ${roleLabel} ${status}</li>`;
+    });
+    html += `</ul>`;
+  }
+
+  box.innerHTML = html;
+  go("revealPairs");
 }
-
+	
 function replay(){
   if(!setupWordsAndRoles()) return;
   state.index=0;
@@ -565,8 +691,6 @@ function resetAll(){
   state.theme=null;
   go("players");
 }
-
-$("playingText").textContent="O sorteio já escolheu quem começa. Agora a partida acontece presencialmente: conversem, deem dicas e tentem descobrir o segredo da rodada!";
 </script>
 </body>
 </html>
